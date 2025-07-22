@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="utf-8"?>
+<package xmlns="http://schemas.microsoft.com/packaging/2010/07/nuspec.xsd">
+  <metadata>
+    <id>Telegram-Apps.Blazor</id>
+    <version>1.0.0</version>
+    <title>Telegram WebApp Integration for Blazor</title>
+    <authors>Fishie</authors>
+    <description>A comprehensive library for integrating Telegram WebApp functionality into Blazor Server and WebAssembly applications. Provides strongly-typed C# wrappers for the complete Telegram WebApp JavaScript API.</description>
+    <summary>Telegram WebApp integration library for Blazor applications with full API coverage and cross-platform support.</summary>
+    <language>en-US</language>
+    <projectUrl>https://github.com/your-repo/telegram-apps-blazor</projectUrl>
+    <iconUrl>https://raw.githubusercontent.com/your-repo/telegram-apps-blazor/main/icon.png</iconUrl>
+    <requireLicenseAcceptance>false</requireLicenseAcceptance>
+    <licenseUrl>https://github.com/your-repo/telegram-apps-blazor/blob/main/LICENSE</licenseUrl>
+    <copyright>Copyright © 2024 Fishie</copyright>
+    <releaseNotes>
+      v1.0.0:
+      - Initial release
+      - Complete Telegram WebApp API coverage
+      - Support for Blazor Server and WebAssembly
+      - Strongly-typed C# models
+      - Error handling and graceful fallbacks
+      - Demo components and examples
+    </releaseNotes>
+    <tags>Telegram WebApp Blazor WASM Server Bot Mini-App JavaScript-Interop</tags>
+    <dependencies>
+      <group targetFramework="net7.0">
+        <dependency id="Microsoft.AspNetCore.Components.Web" version="7.0.0" />
+        <dependency id="Microsoft.JSInterop" version="7.0.0" />
+      </group>
+    </dependencies>
+  </metadata>
+  <files>
+    <file src="bin\Release\net7.0\Telegram-Apps.Blazor.dll" target="lib\net7.0\" />
+    <file src="bin\Release\net7.0\Telegram-Apps.Blazor.pdb" target="lib\net7.0\" />
+    <file src="wwwroot\**" target="staticwebassets\" />
+    <file src="README.md" target="" />
+  </files>
+</package>

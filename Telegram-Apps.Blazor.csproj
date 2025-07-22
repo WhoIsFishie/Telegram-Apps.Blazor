@@ -1,0 +1,28 @@
+﻿<Project Sdk="Microsoft.NET.Sdk.Razor">
+
+  <PropertyGroup>
+    <TargetFramework>net7.0</TargetFramework>
+    <RootNamespace>TelegramApps.Blazor</RootNamespace>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+    <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+    <PackageId>Telegram-Apps.Blazor</PackageId>
+    <PackageVersion>1.0.0</PackageVersion>
+    <Title>Telegram WebApp Integration for Blazor</Title>
+    <Description>A comprehensive library for integrating Telegram WebApp functionality into Blazor Server and WebAssembly applications</Description>
+    <Authors>Fishie</Authors>
+    <PackageTags>Telegram;WebApp;Blazor;WASM;Server</PackageTags>
+    <RepositoryUrl>https://github.com/your-repo/telegram-apps-blazor</RepositoryUrl>
+    <PackageLicenseExpression>MIT</PackageLicenseExpression>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.AspNetCore.Components.Web" Version="7.0.0" />
+    <PackageReference Include="Microsoft.JSInterop" Version="7.0.0" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <EmbeddedResource Include="wwwroot\**" />
+  </ItemGroup>
+
+</Project>

@@ -1,0 +1,1089 @@
+@using TelegramApps.Blazor.Services
+@using TelegramApps.Blazor.Models
+@inject ITelegramWebAppService TelegramService
+
+<div class="space-y-4 md:space-y-6">
+    <div class="card">
+        <h2 class="text-lg md:text-xl font-semibold text-brand mb-3 md:mb-4">Telegram Web App Status</h2>
+        
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 md:gap-4">
+            <div>
+                <label class="text-sm text-muted">Available:</label>
+                <p class="text-content">@(isAvailable ? "Yes" : "No")</p>
+            </div>
+            
+            @if (isAvailable)
+            {
+                <div>
+                    <label class="text-sm text-muted">Version:</label>
+                    <p class="text-content">@version</p>
+                </div>
+                
+                <div>
+                    <label class="text-sm text-muted">Platform:</label>
+                    <p class="text-content">@platform</p>
+                </div>
+                
+                <div>
+                    <label class="text-sm text-muted">Color Scheme:</label>
+                    <p class="text-content">@colorScheme</p>
+                </div>
+                
+                <div>
+                    <label class="text-sm text-muted">Expanded:</label>
+                    <p class="text-content">@(isExpanded ? "Yes" : "No")</p>
+                </div>
+            }
+        </div>
+    </div>
+
+    @if (isAvailable)
+    {
+        <div class="card">
+            <h3 class="text-lg font-semibold text-brand mb-4">User Information</h3>
+            
+            @if (initData?.User != null)
+            {
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 md:gap-4">
+                    <div>
+                        <label class="text-sm text-muted">User ID:</label>
+                        <p class="text-content">@initData.User.Id</p>
+                    </div>
+                    
+                    <div>
+                        <label class="text-sm text-muted">First Name:</label>
+                        <p class="text-content">@initData.User.FirstName</p>
+                    </div>
+                    
+                    @if (!string.IsNullOrEmpty(initData.User.LastName))
+                    {
+                        <div>
+                            <label class="text-sm text-muted">Last Name:</label>
+                            <p class="text-content">@initData.User.LastName</p>
+                        </div>
+                    }
+                    
+                    @if (!string.IsNullOrEmpty(initData.User.Username))
+                    {
+                        <div>
+                            <label class="text-sm text-muted">Username:</label>
+                            <p class="text-content">@@@initData.User.Username</p>
+                        </div>
+                    }
+                    
+                    @if (!string.IsNullOrEmpty(initData.User.LanguageCode))
+                    {
+                        <div>
+                            <label class="text-sm text-muted">Language:</label>
+                            <p class="text-content">@initData.User.LanguageCode</p>
+                        </div>
+                    }
+                    
+                    @if (initData.User.IsPremium.HasValue)
+                    {
+                        <div>
+                            <label class="text-sm text-muted">Premium:</label>
+                            <p class="text-content">@(initData.User.IsPremium.Value ? "Yes" : "No")</p>
+                        </div>
+                    }
+                    
+                    @if (!string.IsNullOrEmpty(initData.AuthDate))
+                    {
+                        <div>
+                            <label class="text-sm text-muted">Auth Date:</label>
+                            <p class="text-content">@initData.AuthDate</p>
+                        </div>
+                    }
+                </div>
+            }
+            else
+            {
+                <p class="text-muted">No user data available (running outside Telegram)</p>
+            }
+        </div>
+
+        <div class="card">
+            <h3 class="text-lg font-semibold text-brand mb-4">WebApp Controls</h3>
+            
+            <div class="space-y-4">
+                <div class="grid grid-cols-1 sm:grid-cols-3 gap-2">
+                    <button class="btn-primary" @onclick="ReadyWebApp">Ready</button>
+                    <button class="btn-secondary" @onclick="ExpandWebApp">Expand</button>
+                    <button class="btn-outline" @onclick="CloseWebApp">Close</button>
+                </div>
+                
+                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-2">
+                    <button class="btn-primary" @onclick="ShowMainButton">Show Main Button</button>
+                    <button class="btn-secondary" @onclick="HideMainButton">Hide Main Button</button>
+                    <button class="btn-outline" @onclick="ShowBackButton">Show Back Button</button>
+                    <button class="btn-outline" @onclick="HideBackButton">Hide Back Button</button>
+                </div>
+                
+                <div class="grid grid-cols-1 sm:grid-cols-3 gap-2">
+                    <button class="btn-primary" @onclick="SendTestData">Send Test Data</button>
+                    <button class="btn-secondary" @onclick="ShowTestAlert">Show Alert</button>
+                    <button class="btn-outline" @onclick="ShowTestConfirm">Show Confirm</button>
+                </div>
+                
+                <div class="grid grid-cols-1 sm:grid-cols-3 gap-2">
+                    <button class="btn-primary" @onclick="TriggerHaptic">Haptic Feedback</button>
+                    <button class="btn-secondary" @onclick="RequestLocation">Request Location</button>
+                    <button class="btn-outline" @onclick="RequestContact">Request Contact</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Raw Init Data Viewer -->
+        <div class="card">
+            <h3 class="text-base md:text-lg font-semibold text-brand mb-3 md:mb-4">Raw Init Data</h3>
+            
+            <div class="space-y-3 md:space-y-4">
+                <button class="btn-primary w-full sm:w-auto" @onclick="RefreshInitData">Refresh Init Data</button>
+                
+                @if (!string.IsNullOrEmpty(rawInitData))
+                {
+                    <div class="bg-dark-900 rounded-lg p-4 overflow-x-auto">
+                        <pre class="text-sm text-content whitespace-pre-wrap font-mono">@rawInitData</pre>
+                    </div>
+                }
+                else
+                {
+                    <p class="text-muted">No init data available</p>
+                }
+            </div>
+        </div>
+
+        <!-- Cloud Storage Testing -->
+        <div class="card">
+            <h3 class="text-base md:text-lg font-semibold text-brand mb-3 md:mb-4">Cloud Storage Testing</h3>
+            
+            <div class="space-y-3 md:space-y-4">
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 md:gap-4">
+                    <div>
+                        <label class="block text-sm text-muted mb-2">Key:</label>
+                        <input @bind="storageKey" class="w-full px-3 py-2 bg-surface border border-neutral-300 dark:border-dark-700 rounded-lg text-content text-sm md:text-base" 
+                               placeholder="Enter storage key" />
+                    </div>
+                    <div>
+                        <label class="block text-sm text-muted mb-2">Value:</label>
+                        <input @bind="storageValue" class="w-full px-3 py-2 bg-surface border border-neutral-300 dark:border-dark-700 rounded-lg text-content text-sm md:text-base" 
+                               placeholder="Enter storage value" />
+                    </div>
+                </div>
+                
+                <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-2">
+                    <button class="btn-primary" @onclick="SetStorageItem">Set Item</button>
+                    <button class="btn-secondary" @onclick="GetStorageItem">Get Item</button>
+                    <button class="btn-outline" @onclick="RemoveStorageItem">Remove</button>
+                    <button class="btn-outline" @onclick="GetAllStorageKeys">All Keys</button>
+                    <button class="btn-outline" @onclick="ClearAllStorage">Clear All</button>
+                </div>
+                
+                @if (!string.IsNullOrEmpty(storageResult))
+                {
+                    <div class="bg-dark-900 rounded-lg p-4">
+                        <pre class="text-sm text-content whitespace-pre-wrap font-mono">@storageResult</pre>
+                    </div>
+                }
+            </div>
+        </div>
+
+        <!-- Biometric Authentication -->
+        <div class="card">
+            <h3 class="text-base md:text-lg font-semibold text-brand mb-3 md:mb-4">Biometric Authentication</h3>
+            
+            <div class="space-y-3 md:space-y-4">
+                <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 md:gap-4">
+                    <div>
+                        <label class="text-sm text-muted">Available:</label>
+                        <p class="text-content">@(biometricAvailable ? "Yes" : "No")</p>
+                    </div>
+                    <div>
+                        <label class="text-sm text-muted">Type:</label>
+                        <p class="text-content">@biometricType</p>
+                    </div>
+                    <div>
+                        <label class="text-sm text-muted">Access Granted:</label>
+                        <p class="text-content">@(biometricAccessGranted ? "Yes" : "No")</p>
+                    </div>
+                </div>
+                
+                <div>
+                    <label class="block text-sm text-muted mb-2">Reason:</label>
+                    <input @bind="biometricReason" class="w-full px-3 py-2 bg-surface border border-neutral-300 dark:border-dark-700 rounded-lg text-content text-sm md:text-base" 
+                           placeholder="Enter authentication reason" />
+                </div>
+                
+                <div class="grid grid-cols-2 sm:grid-cols-4 gap-2">
+                    <button class="btn-primary text-xs md:text-sm" @onclick="CheckBiometricStatus">Check Status</button>
+                    <button class="btn-secondary text-xs md:text-sm" @onclick="RequestBiometricAccess">Request Access</button>
+                    <button class="btn-outline text-xs md:text-sm" @onclick="AuthenticateBiometric">Authenticate</button>
+                    <button class="btn-outline text-xs md:text-sm" @onclick="UpdateBiometricToken">Update Token</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Device Sensors -->
+        <div class="card">
+            <h3 class="text-base md:text-lg font-semibold text-brand mb-3 md:mb-4">Device Sensors</h3>
+            
+            <div class="space-y-3 md:space-y-4">
+                <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 md:gap-4">
+                    <div>
+                        <label class="text-sm text-muted">Accelerometer:</label>
+                        <p class="text-content">@(accelerometerAvailable ? "Available" : "Not Available")</p>
+                    </div>
+                    <div>
+                        <label class="text-sm text-muted">Gyroscope:</label>
+                        <p class="text-content">@(gyroscopeAvailable ? "Available" : "Not Available")</p>
+                    </div>
+                    <div>
+                        <label class="text-sm text-muted">Device Orientation:</label>
+                        <p class="text-content">@(deviceOrientationAvailable ? "Available" : "Not Available")</p>
+                    </div>
+                </div>
+                
+                <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-2">
+                    <button class="btn-primary text-xs md:text-sm" @onclick="CheckSensorStatus">Check</button>
+                    <button class="btn-secondary text-xs md:text-sm" @onclick="StartAccelerometer">Start Accel</button>
+                    <button class="btn-secondary text-xs md:text-sm" @onclick="StopAccelerometer">Stop Accel</button>
+                    <button class="btn-outline text-xs md:text-sm" @onclick="StartGyroscope">Start Gyro</button>
+                    <button class="btn-outline text-xs md:text-sm" @onclick="StopGyroscope">Stop Gyro</button>
+                    <button class="btn-outline text-xs md:text-sm" @onclick="RequestDeviceOrientation">Orientation</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Advanced Features -->
+        <div class="card">
+            <h3 class="text-base md:text-lg font-semibold text-brand mb-3 md:mb-4">Advanced Features</h3>
+            
+            <div class="space-y-3 md:space-y-4">
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 md:gap-4">
+                    <div>
+                        <label class="block text-sm text-muted mb-2">QR Text:</label>
+                        <input @bind="qrText" class="w-full px-3 py-2 bg-surface border border-neutral-300 dark:border-dark-700 rounded-lg text-content text-sm md:text-base" 
+                               placeholder="Scan QR code instruction" />
+                    </div>
+                    <div>
+                        <label class="block text-sm text-muted mb-2">Download URL:</label>
+                        <input @bind="downloadUrl" class="w-full px-3 py-2 bg-surface border border-neutral-300 dark:border-dark-700 rounded-lg text-content text-sm md:text-base" 
+                               placeholder="File URL to download" />
+                    </div>
+                </div>
+                
+                <div class="grid grid-cols-1 sm:grid-cols-3 gap-2">
+                    <button class="btn-primary text-sm" @onclick="ShowScanQrPopup">Scan QR Code</button>
+                    <button class="btn-secondary text-sm" @onclick="DownloadFile">Download File</button>
+                    <button class="btn-outline text-sm" @onclick="SwitchInlineQuery">Switch Inline Query</button>
+                </div>
+                
+                @if (!string.IsNullOrEmpty(advancedResult))
+                {
+                    <div class="bg-dark-900 rounded-lg p-4">
+                        <pre class="text-sm text-content whitespace-pre-wrap font-mono">@advancedResult</pre>
+                    </div>
+                }
+            </div>
+        </div>
+
+        <!-- UI Customization -->
+        <div class="card">
+            <h3 class="text-base md:text-lg font-semibold text-brand mb-3 md:mb-4">UI Customization</h3>
+            
+            <div class="space-y-3 md:space-y-4">
+                <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 md:gap-4">
+                    <div>
+                        <label class="block text-sm text-muted mb-2">Header Color:</label>
+                        <input type="color" @bind="headerColor" class="w-full h-10 md:h-12 rounded-lg border border-neutral-300 dark:border-dark-700" />
+                    </div>
+                    <div>
+                        <label class="block text-sm text-muted mb-2">Background Color:</label>
+                        <input type="color" @bind="backgroundColor" class="w-full h-10 md:h-12 rounded-lg border border-neutral-300 dark:border-dark-700" />
+                    </div>
+                    <div>
+                        <label class="block text-sm text-muted mb-2">Bottom Bar Color:</label>
+                        <input type="color" @bind="bottomBarColor" class="w-full h-10 md:h-12 rounded-lg border border-neutral-300 dark:border-dark-700" />
+                    </div>
+                </div>
+                
+                <div class="grid grid-cols-2 sm:grid-cols-4 gap-2">
+                    <button class="btn-primary text-xs md:text-sm" @onclick="ApplyHeaderColor">Apply Header</button>
+                    <button class="btn-secondary text-xs md:text-sm" @onclick="ApplyBackgroundColor">Apply BG</button>
+                    <button class="btn-outline text-xs md:text-sm" @onclick="ApplyBottomBarColor">Apply Bottom</button>
+                    <button class="btn-outline text-xs md:text-sm" @onclick="ResetColors">Reset</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Popup Testing -->
+        <div class="card">
+            <h3 class="text-base md:text-lg font-semibold text-brand mb-3 md:mb-4">Popup & Dialog Testing</h3>
+            
+            <div class="space-y-3 md:space-y-4">
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 md:gap-4">
+                    <div>
+                        <label class="block text-sm text-muted mb-2">Popup Title:</label>
+                        <input @bind="popupTitle" class="w-full px-3 py-2 bg-surface border border-neutral-300 dark:border-dark-700 rounded-lg text-content text-sm md:text-base" 
+                               placeholder="Popup title" />
+                    </div>
+                    <div>
+                        <label class="block text-sm text-muted mb-2">Popup Message:</label>
+                        <input @bind="popupMessage" class="w-full px-3 py-2 bg-surface border border-neutral-300 dark:border-dark-700 rounded-lg text-content text-sm md:text-base" 
+                               placeholder="Popup message" />
+                    </div>
+                </div>
+                
+                <div class="grid grid-cols-1 sm:grid-cols-3 gap-2">
+                    <button class="btn-primary text-sm" @onclick="ShowCustomPopup">Custom Popup</button>
+                    <button class="btn-secondary text-sm" @onclick="ShowMultiButtonPopup">Multi-Button</button>
+                    <button class="btn-outline text-sm" @onclick="ShowDestructivePopup">Destructive</button>
+                </div>
+                
+                @if (!string.IsNullOrEmpty(popupResult))
+                {
+                    <div class="bg-dark-900 rounded-lg p-4">
+                        <p class="text-sm text-content">Last popup result: <span class="font-mono">@popupResult</span></p>
+                    </div>
+                }
+            </div>
+        </div>
+
+        <!-- Haptic Feedback Testing -->
+        <div class="card">
+            <h3 class="text-base md:text-lg font-semibold text-brand mb-3 md:mb-4">Haptic Feedback Testing</h3>
+            
+            <div class="space-y-3 md:space-y-4">
+                <div class="grid grid-cols-3 gap-2">
+                    <button class="btn-primary text-xs md:text-sm" @onclick="@(() => TriggerHapticStyle("light"))">Light</button>
+                    <button class="btn-primary text-xs md:text-sm" @onclick="@(() => TriggerHapticStyle("medium"))">Medium</button>
+                    <button class="btn-primary text-xs md:text-sm" @onclick="@(() => TriggerHapticStyle("heavy"))">Heavy</button>
+                </div>
+                
+                <div class="grid grid-cols-3 gap-2">
+                    <button class="btn-secondary text-xs md:text-sm" @onclick="@(() => TriggerNotification("error"))">Error</button>
+                    <button class="btn-secondary text-xs md:text-sm" @onclick="@(() => TriggerNotification("success"))">Success</button>
+                    <button class="btn-secondary text-xs md:text-sm" @onclick="@(() => TriggerNotification("warning"))">Warning</button>
+                </div>
+                
+                <div class="grid grid-cols-1">
+                    <button class="btn-outline text-sm" @onclick="TriggerSelectionChanged">Selection Changed</button>
+                </div>
+            </div>
+        </div>
+
+        @if (themeParams != null)
+        {
+            <div class="card">
+                <h3 class="text-base md:text-lg font-semibold text-brand mb-3 md:mb-4">Theme Parameters</h3>
+                
+                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 md:gap-4 text-sm">
+                    @if (!string.IsNullOrEmpty(themeParams.BackgroundColor))
+                    {
+                        <div>
+                            <label class="text-muted">Background:</label>
+                            <div class="flex items-center gap-2">
+                                <div class="w-4 h-4 rounded border" style="background-color: @themeParams.BackgroundColor"></div>
+                                <span class="text-content font-mono">@themeParams.BackgroundColor</span>
+                            </div>
+                        </div>
+                    }
+                    
+                    @if (!string.IsNullOrEmpty(themeParams.TextColor))
+                    {
+                        <div>
+                            <label class="text-muted">Text:</label>
+                            <div class="flex items-center gap-2">
+                                <div class="w-4 h-4 rounded border" style="background-color: @themeParams.TextColor"></div>
+                                <span class="text-content font-mono">@themeParams.TextColor</span>
+                            </div>
+                        </div>
+                    }
+                    
+                    @if (!string.IsNullOrEmpty(themeParams.ButtonColor))
+                    {
+                        <div>
+                            <label class="text-muted">Button:</label>
+                            <div class="flex items-center gap-2">
+                                <div class="w-4 h-4 rounded border" style="background-color: @themeParams.ButtonColor"></div>
+                                <span class="text-content font-mono">@themeParams.ButtonColor</span>
+                            </div>
+                        </div>
+                    }
+                </div>
+            </div>
+        }
+    }
+</div>
+
+@code {
+    private bool isAvailable = false;
+    private string version = "";
+    private string platform = "";
+    private string colorScheme = "";
+    private bool isExpanded = false;
+    private WebAppInitData? initData;
+    private ThemeParams? themeParams;
+
+    // Raw init data
+    private string rawInitData = "";
+
+    // Cloud storage
+    private string storageKey = "";
+    private string storageValue = "";
+    private string storageResult = "";
+
+    // Biometric
+    private bool biometricAvailable = false;
+    private string biometricType = "";
+    private bool biometricAccessGranted = false;
+    private string biometricReason = "Authenticate to access secure features";
+
+    // Sensors
+    private bool accelerometerAvailable = false;
+    private bool gyroscopeAvailable = false;
+    private bool deviceOrientationAvailable = false;
+
+    // Advanced features
+    private string qrText = "Scan this QR code";
+    private string downloadUrl = "";
+    private string advancedResult = "";
+
+    // UI customization
+    private string headerColor = "#a52e39";
+    private string backgroundColor = "#fffee0";
+    private string bottomBarColor = "#a52e39";
+
+    // Popups
+    private string popupTitle = "Custom Popup";
+    private string popupMessage = "This is a custom popup message";
+    private string popupResult = "";
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            await LoadWebAppInfo();
+        }
+    }
+
+    private async Task LoadWebAppInfo()
+    {
+        try
+        {
+            isAvailable = await TelegramService.IsAvailableAsync();
+            
+            if (isAvailable)
+            {
+                version = await TelegramService.GetVersionAsync() ?? "";
+                platform = await TelegramService.GetPlatformAsync() ?? "";
+                colorScheme = await TelegramService.GetColorSchemeAsync() ?? "light";
+                isExpanded = await TelegramService.IsExpandedAsync();
+                
+                try
+                {
+                    initData = await TelegramService.GetInitDataAsync();
+                }
+                catch (Exception ex)
+                {
+                    Console.WriteLine($"Error loading init data: {ex.Message}");
+                    initData = null;
+                }
+                
+                try
+                {
+                    themeParams = await TelegramService.GetThemeParamsAsync();
+                }
+                catch (Exception ex)
+                {
+                    Console.WriteLine($"Error loading theme params: {ex.Message}");
+                    themeParams = null;
+                }
+
+                // Initialize additional features
+                await RefreshInitData();
+                await CheckBiometricStatus();
+                await CheckSensorStatus();
+                
+                StateHasChanged();
+            }
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Error loading Telegram WebApp info: {ex.Message}");
+        }
+    }
+
+    private async Task ReadyWebApp()
+    {
+        await TelegramService.ReadyAsync();
+    }
+
+    private async Task ExpandWebApp()
+    {
+        await TelegramService.ExpandAsync();
+        await Task.Delay(100);
+        isExpanded = await TelegramService.IsExpandedAsync();
+        StateHasChanged();
+    }
+
+    private async Task CloseWebApp()
+    {
+        await TelegramService.CloseAsync();
+    }
+
+    private async Task ShowMainButton()
+    {
+        await TelegramService.SetMainButtonTextAsync("Main Action");
+        await TelegramService.ShowMainButtonAsync();
+    }
+
+    private async Task HideMainButton()
+    {
+        await TelegramService.HideMainButtonAsync();
+    }
+
+    private async Task ShowBackButton()
+    {
+        await TelegramService.ShowBackButtonAsync();
+    }
+
+    private async Task HideBackButton()
+    {
+        await TelegramService.HideBackButtonAsync();
+    }
+
+    private async Task SendTestData()
+    {
+        var testData = new { message = "Hello from Blazor!", timestamp = DateTime.UtcNow };
+        await TelegramService.SendDataAsync(System.Text.Json.JsonSerializer.Serialize(testData));
+    }
+
+    private async Task ShowTestAlert()
+    {
+        await TelegramService.ShowAlertAsync("This is a test alert from the Blazor WebApp!");
+    }
+
+    private async Task ShowTestConfirm()
+    {
+        var result = await TelegramService.ShowConfirmAsync("Do you want to proceed with this action?");
+        await TelegramService.ShowAlertAsync($"You selected: {(result ? "Yes" : "No")}");
+    }
+
+    private async Task TriggerHaptic()
+    {
+        await TelegramService.ImpactOccurredAsync("medium");
+    }
+
+    private async Task RequestLocation()
+    {
+        try
+        {
+            await TelegramService.RequestLocationAsync();
+        }
+        catch (Exception ex)
+        {
+            await TelegramService.ShowAlertAsync($"Location request not supported: {ex.Message}");
+        }
+    }
+
+    private async Task RequestContact()
+    {
+        try
+        {
+            await TelegramService.RequestContactAsync();
+        }
+        catch (Exception ex)
+        {
+            await TelegramService.ShowAlertAsync($"Contact request not supported: {ex.Message}");
+        }
+    }
+
+    // Raw init data methods
+    private async Task RefreshInitData()
+    {
+        try
+        {
+            var initDataObj = await TelegramService.GetInitDataAsync();
+            if (initDataObj != null)
+            {
+                rawInitData = System.Text.Json.JsonSerializer.Serialize(initDataObj, new System.Text.Json.JsonSerializerOptions 
+                { 
+                    WriteIndented = true 
+                });
+            }
+            else
+            {
+                rawInitData = "No init data available";
+            }
+            StateHasChanged();
+        }
+        catch (Exception ex)
+        {
+            rawInitData = $"Error: {ex.Message}";
+            StateHasChanged();
+        }
+    }
+
+    // Cloud storage methods
+    private async Task SetStorageItem()
+    {
+        try
+        {
+            if (string.IsNullOrEmpty(storageKey))
+            {
+                storageResult = "Error: Key cannot be empty";
+                return;
+            }
+
+            await TelegramService.SetCloudStorageItemAsync(storageKey, storageValue);
+            storageResult = $"Set '{storageKey}' = '{storageValue}'";
+            StateHasChanged();
+        }
+        catch (Exception ex)
+        {
+            storageResult = $"Error setting item: {ex.Message}";
+            StateHasChanged();
+        }
+    }
+
+    private async Task GetStorageItem()
+    {
+        try
+        {
+            if (string.IsNullOrEmpty(storageKey))
+            {
+                storageResult = "Error: Key cannot be empty";
+                return;
+            }
+
+            var value = await TelegramService.GetCloudStorageItemAsync(storageKey);
+            storageResult = $"'{storageKey}' = '{value ?? "null"}'";
+            StateHasChanged();
+        }
+        catch (Exception ex)
+        {
+            storageResult = $"Error getting item: {ex.Message}";
+            StateHasChanged();
+        }
+    }
+
+    private async Task RemoveStorageItem()
+    {
+        try
+        {
+            if (string.IsNullOrEmpty(storageKey))
+            {
+                storageResult = "Error: Key cannot be empty";
+                return;
+            }
+
+            await TelegramService.RemoveCloudStorageItemAsync(storageKey);
+            storageResult = $"Removed '{storageKey}'";
+            StateHasChanged();
+        }
+        catch (Exception ex)
+        {
+            storageResult = $"Error removing item: {ex.Message}";
+            StateHasChanged();
+        }
+    }
+
+    private async Task GetAllStorageKeys()
+    {
+        try
+        {
+            var keys = await TelegramService.GetCloudStorageKeysAsync();
+            storageResult = $"Keys: [{string.Join(", ", keys.Select(k => $"'{k}'"))}]";
+            StateHasChanged();
+        }
+        catch (Exception ex)
+        {
+            storageResult = $"Error getting keys: {ex.Message}";
+            StateHasChanged();
+        }
+    }
+
+    private async Task ClearAllStorage()
+    {
+        try
+        {
+            var keys = await TelegramService.GetCloudStorageKeysAsync();
+            await TelegramService.RemoveCloudStorageItemsAsync(keys);
+            storageResult = $"Cleared {keys.Length} items";
+            StateHasChanged();
+        }
+        catch (Exception ex)
+        {
+            storageResult = $"Error clearing storage: {ex.Message}";
+            StateHasChanged();
+        }
+    }
+
+    // Biometric methods
+    private async Task CheckBiometricStatus()
+    {
+        try
+        {
+            biometricAvailable = await TelegramService.IsBiometricAvailableAsync();
+            biometricType = await TelegramService.GetBiometricTypeAsync();
+            biometricAccessGranted = await TelegramService.IsBiometricAccessGrantedAsync();
+            StateHasChanged();
+        }
+        catch (Exception ex)
+        {
+            await TelegramService.ShowAlertAsync($"Error checking biometric status: {ex.Message}");
+        }
+    }
+
+    private async Task RequestBiometricAccess()
+    {
+        try
+        {
+            var parameters = new BiometricRequestAccessParams { Reason = biometricReason };
+            await TelegramService.RequestBiometricAccessAsync(parameters);
+            await CheckBiometricStatus();
+        }
+        catch (Exception ex)
+        {
+            await TelegramService.ShowAlertAsync($"Error requesting biometric access: {ex.Message}");
+        }
+    }
+
+    private async Task AuthenticateBiometric()
+    {
+        try
+        {
+            var parameters = new BiometricAuthenticateParams { Reason = biometricReason };
+            await TelegramService.AuthenticateBiometricAsync(parameters);
+        }
+        catch (Exception ex)
+        {
+            await TelegramService.ShowAlertAsync($"Error authenticating: {ex.Message}");
+        }
+    }
+
+    private async Task UpdateBiometricToken()
+    {
+        try
+        {
+            var token = $"token_{DateTime.Now.Ticks}";
+            await TelegramService.UpdateBiometricTokenAsync(token);
+            await TelegramService.ShowAlertAsync($"Token updated: {token}");
+        }
+        catch (Exception ex)
+        {
+            await TelegramService.ShowAlertAsync($"Error updating token: {ex.Message}");
+        }
+    }
+
+    // Sensor methods
+    private async Task CheckSensorStatus()
+    {
+        try
+        {
+            accelerometerAvailable = await TelegramService.IsAccelerometerAvailableAsync();
+            gyroscopeAvailable = await TelegramService.IsGyroscopeAvailableAsync();
+            deviceOrientationAvailable = await TelegramService.IsDeviceOrientationAvailableAsync();
+            StateHasChanged();
+        }
+        catch (Exception ex)
+        {
+            await TelegramService.ShowAlertAsync($"Error checking sensors: {ex.Message}");
+        }
+    }
+
+    private async Task StartAccelerometer()
+    {
+        try
+        {
+            await TelegramService.StartAccelerometerAsync();
+            await TelegramService.ShowAlertAsync("Accelerometer started");
+        }
+        catch (Exception ex)
+        {
+            await TelegramService.ShowAlertAsync($"Error starting accelerometer: {ex.Message}");
+        }
+    }
+
+    private async Task StopAccelerometer()
+    {
+        try
+        {
+            await TelegramService.StopAccelerometerAsync();
+            await TelegramService.ShowAlertAsync("Accelerometer stopped");
+        }
+        catch (Exception ex)
+        {
+            await TelegramService.ShowAlertAsync($"Error stopping accelerometer: {ex.Message}");
+        }
+    }
+
+    private async Task StartGyroscope()
+    {
+        try
+        {
+            await TelegramService.StartGyroscopeAsync();
+            await TelegramService.ShowAlertAsync("Gyroscope started");
+        }
+        catch (Exception ex)
+        {
+            await TelegramService.ShowAlertAsync($"Error starting gyroscope: {ex.Message}");
+        }
+    }
+
+    private async Task StopGyroscope()
+    {
+        try
+        {
+            await TelegramService.StopGyroscopeAsync();
+            await TelegramService.ShowAlertAsync("Gyroscope stopped");
+        }
+        catch (Exception ex)
+        {
+            await TelegramService.ShowAlertAsync($"Error stopping gyroscope: {ex.Message}");
+        }
+    }
+
+    private async Task RequestDeviceOrientation()
+    {
+        try
+        {
+            await TelegramService.RequestDeviceOrientationAsync();
+            await TelegramService.ShowAlertAsync("Device orientation requested");
+        }
+        catch (Exception ex)
+        {
+            await TelegramService.ShowAlertAsync($"Error requesting device orientation: {ex.Message}");
+        }
+    }
+
+    // Advanced feature methods
+    private async Task ShowScanQrPopup()
+    {
+        try
+        {
+            var parameters = new ScanQrPopupParams { Text = qrText };
+            var result = await TelegramService.ShowScanQrPopupAsync(parameters);
+            advancedResult = $"QR Scan Result: {result ?? "Cancelled"}";
+            StateHasChanged();
+        }
+        catch (Exception ex)
+        {
+            advancedResult = $"QR Scan Error: {ex.Message}";
+            StateHasChanged();
+        }
+    }
+
+    private async Task DownloadFile()
+    {
+        try
+        {
+            if (string.IsNullOrEmpty(downloadUrl))
+            {
+                advancedResult = "Error: Download URL cannot be empty";
+                return;
+            }
+
+            var filename = $"download_{DateTime.Now:yyyyMMdd_HHmmss}.file";
+            await TelegramService.DownloadFileAsync(downloadUrl, filename);
+            advancedResult = $"Download started: {filename}";
+            StateHasChanged();
+        }
+        catch (Exception ex)
+        {
+            advancedResult = $"Download Error: {ex.Message}";
+            StateHasChanged();
+        }
+    }
+
+    private async Task SwitchInlineQuery()
+    {
+        try
+        {
+            await TelegramService.SwitchInlineQueryAsync("test query", new[] { "users", "groups" });
+            advancedResult = "Inline query switched";
+            StateHasChanged();
+        }
+        catch (Exception ex)
+        {
+            advancedResult = $"Inline Query Error: {ex.Message}";
+            StateHasChanged();
+        }
+    }
+
+    // UI customization methods
+    private async Task ApplyHeaderColor()
+    {
+        try
+        {
+            await TelegramService.SetHeaderColorAsync(headerColor);
+        }
+        catch (Exception ex)
+        {
+            await TelegramService.ShowAlertAsync($"Error setting header color: {ex.Message}");
+        }
+    }
+
+    private async Task ApplyBackgroundColor()
+    {
+        try
+        {
+            await TelegramService.SetBackgroundColorAsync(backgroundColor);
+        }
+        catch (Exception ex)
+        {
+            await TelegramService.ShowAlertAsync($"Error setting background color: {ex.Message}");
+        }
+    }
+
+    private async Task ApplyBottomBarColor()
+    {
+        try
+        {
+            await TelegramService.SetBottomBarColorAsync(bottomBarColor);
+        }
+        catch (Exception ex)
+        {
+            await TelegramService.ShowAlertAsync($"Error setting bottom bar color: {ex.Message}");
+        }
+    }
+
+    private async Task ResetColors()
+    {
+        try
+        {
+            headerColor = "#a52e39";
+            backgroundColor = "#fffee0";
+            bottomBarColor = "#a52e39";
+            
+            await TelegramService.SetHeaderColorAsync(headerColor);
+            await TelegramService.SetBackgroundColorAsync(backgroundColor);
+            await TelegramService.SetBottomBarColorAsync(bottomBarColor);
+            
+            StateHasChanged();
+        }
+        catch (Exception ex)
+        {
+            await TelegramService.ShowAlertAsync($"Error resetting colors: {ex.Message}");
+        }
+    }
+
+    // Popup methods
+    private async Task ShowCustomPopup()
+    {
+        try
+        {
+            var popup = new PopupParams
+            {
+                Title = popupTitle,
+                Message = popupMessage,
+                Buttons = new[]
+                {
+                    new PopupButton { Id = "ok", Type = "default", Text = "OK" },
+                    new PopupButton { Id = "cancel", Type = "cancel", Text = "Cancel" }
+                }
+            };
+
+            await TelegramService.ShowPopupAsync(popup);
+            popupResult = "Custom popup shown";
+            StateHasChanged();
+        }
+        catch (Exception ex)
+        {
+            popupResult = $"Popup Error: {ex.Message}";
+            StateHasChanged();
+        }
+    }
+
+    private async Task ShowMultiButtonPopup()
+    {
+        try
+        {
+            var popup = new PopupParams
+            {
+                Title = "Multi-Button Popup",
+                Message = "Choose one of the options below:",
+                Buttons = new[]
+                {
+                    new PopupButton { Id = "option1", Type = "default", Text = "Option 1" },
+                    new PopupButton { Id = "option2", Type = "default", Text = "Option 2" },
+                    new PopupButton { Id = "option3", Type = "default", Text = "Option 3" },
+                    new PopupButton { Id = "cancel", Type = "cancel", Text = "Cancel" }
+                }
+            };
+
+            await TelegramService.ShowPopupAsync(popup);
+            popupResult = "Multi-button popup shown";
+            StateHasChanged();
+        }
+        catch (Exception ex)
+        {
+            popupResult = $"Multi-Button Popup Error: {ex.Message}";
+            StateHasChanged();
+        }
+    }
+
+    private async Task ShowDestructivePopup()
+    {
+        try
+        {
+            var popup = new PopupParams
+            {
+                Title = "Destructive Action",
+                Message = "This action cannot be undone. Are you sure?",
+                Buttons = new[]
+                {
+                    new PopupButton { Id = "delete", Type = "destructive", Text = "Delete" },
+                    new PopupButton { Id = "cancel", Type = "cancel", Text = "Cancel" }
+                }
+            };
+
+            await TelegramService.ShowPopupAsync(popup);
+            popupResult = "Destructive popup shown";
+            StateHasChanged();
+        }
+        catch (Exception ex)
+        {
+            popupResult = $"Destructive Popup Error: {ex.Message}";
+            StateHasChanged();
+        }
+    }
+
+    // Enhanced haptic methods
+    private async Task TriggerHapticStyle(string style)
+    {
+        try
+        {
+            await TelegramService.ImpactOccurredAsync(style);
+        }
+        catch (Exception ex)
+        {
+            await TelegramService.ShowAlertAsync($"Haptic error: {ex.Message}");
+        }
+    }
+
+    private async Task TriggerNotification(string type)
+    {
+        try
+        {
+            await TelegramService.NotificationOccurredAsync(type);
+        }
+        catch (Exception ex)
+        {
+            await TelegramService.ShowAlertAsync($"Notification error: {ex.Message}");
+        }
+    }
+
+    private async Task TriggerSelectionChanged()
+    {
+        try
+        {
+            await TelegramService.SelectionChangedAsync();
+        }
+        catch (Exception ex)
+        {
+            await TelegramService.ShowAlertAsync($"Selection changed error: {ex.Message}");
+        }
+    }
+}
