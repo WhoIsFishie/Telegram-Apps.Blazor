@@ -42,3 +42,4 @@ obj/Debug/net7.0/staticwebassets/msbuild.buildTransitive.Telegram-Apps.Blazor.pr
 obj/Debug/net7.0/staticwebassets/msbuild.Telegram-Apps.Blazor.Microsoft.AspNetCore.StaticWebAssetEndpoints.props
 obj/Debug/net7.0/staticwebassets/msbuild.Telegram-Apps.Blazor.Microsoft.AspNetCore.StaticWebAssets.props
 CHANGELOG.md
+/obj/Debug/net7.0
